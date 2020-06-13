@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import logo from './logo.svg';
-import './App.css';
+import { loadCurrentWeather } from './redux/reducers/weatherReducer';
+import './css/main.css';
 
-function App({ city }) {
-  console.log({ city });
+function App({ city, loadCurrentWeather, currentWeather, loading }) {
+  useEffect(() => {
+    loadCurrentWeather();
+  }, []);
+
   return (
     <div className="App">
+      {loading && <p>loading</p>}
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
@@ -25,9 +28,13 @@ function App({ city }) {
   );
 }
 
-const mapStateToProps = (state) => {
-  return {
+export default connect(
+  (state) => ({
     city: state.city,
-  };
-};
-export default connect(mapStateToProps)(App);
+    currentWeather: state.currentWeather,
+    loading: state.loading,
+  }),
+  (dispatch) => ({
+    loadCurrentWeather: () => dispatch(loadCurrentWeather()),
+  })
+)(App);
