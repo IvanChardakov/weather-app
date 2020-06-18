@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePosition } from './utils/usePosition';
 import Search from './components/Search';
 import { connect } from 'react-redux';
