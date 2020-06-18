@@ -7,12 +7,16 @@ import { connect } from 'react-redux';
 import debounce from 'lodash/debounce';
 
 const Search = ({ city, loading, changeCity }) => {
-  const [searchValue, setSearchValue] = useState(city || '');
+  const [searchValue, setSearchValue] = useState('');
   const [showIcon, setShowIcon] = useState(true);
 
   useEffect(() => {
     loading && setShowIcon(true);
   }, [loading]);
+
+  useEffect(() => {
+    setSearchValue(city);
+  }, [city]);
 
   const onInputChange = useCallback(
     debounce((city) => {

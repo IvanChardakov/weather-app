@@ -3,7 +3,7 @@ import axios from 'axios';
 const api = 'http://api.openweathermap.org/data/2.5/';
 const API_KEY = '11180e762873f17713a0cd96aea3d47d';
 
-const initialState = { city: 'plovdiv', currentWeather: {}, fiveDayWeather: [], loading: false };
+const initialState = { city: '', currentWeather: {}, fiveDayWeather: [], loading: false };
 
 const CHANGE_CITY = 'CHANGE_CITY';
 const GET_WEATHER_ERROR = 'GET_WEATHER_ERROR';
@@ -17,12 +17,19 @@ const startFetchingWeather = createAction(START_FETCHING_WEATHER);
 const endFetchingCurrentWeather = createAction(END_FETCHING_CURRENT_WEATHER);
 const endFetchingFiveDayWeather = createAction(END_FETCHING_FIVE_DAY_WEATHER);
 
-export const loadCurrentWeather = (city) => {
+export const loadCurrentWeather = (city, lat = null, lon = null) => {
   return async (dispatch) => {
     dispatch(startFetchingWeather());
     try {
-      const response = await axios.get(`${api}weather?appid=${API_KEY}&q=${city}&units=metric`);
-      dispatch(endFetchingCurrentWeather(response));
+      if (lat && lon) {
+        const response = await axios.get(
+          `${api}weather?appid=${API_KEY}&lat=${lat}&lon=${lon}&units=metric`
+        );
+        dispatch(endFetchingCurrentWeather(response));
+      } else {
+        const response = await axios.get(`${api}weather?appid=${API_KEY}&q=${city}&units=metric`);
+        dispatch(endFetchingCurrentWeather(response));
+      }
     } catch (error) {
       dispatch(getWeatherError(error?.response?.data?.message || 'Something happend'));
     }
@@ -65,6 +72,7 @@ export const weatherReducer = handleActions(
       loading: false,
       error: null,
       currentWeather: payload.data,
+      city: payload.data?.name || '',
     }),
     [END_FETCHING_FIVE_DAY_WEATHER]: (state, { payload }) => ({
       ...state,

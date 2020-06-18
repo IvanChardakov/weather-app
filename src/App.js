@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { usePosition } from './utils/usePosition';
 import Search from './components/Search';
 import { connect } from 'react-redux';
 import { loadCurrentWeather, loadFiveDayWeather } from './redux/reducers/weatherReducer';
@@ -28,6 +29,17 @@ function App({
   error,
 }) {
   const [appState, setAppState] = useState(APP_STATES.initial);
+  const [initialLoad, setInitialLoad] = useState(true);
+  const userPosition = usePosition();
+
+  useEffect(() => {
+    if (initialLoad) {
+      if (!city && userPosition?.latitude && userPosition?.longitude) {
+        loadCurrentWeather(city, userPosition.latitude, userPosition.longitude);
+        setInitialLoad(false);
+      }
+    }
+  }, [initialLoad, userPosition, city, loadCurrentWeather]);
 
   useEffect(() => {
     loadCurrentWeather(city);
@@ -51,7 +63,7 @@ function App({
         className="content-wrapper"
         style={appState !== APP_STATES.initial ? { paddingTop: '20px' } : null}
       >
-        <Search city={city} />
+        <Search />
         {city && !error && !loading && (
           <>
             {currentWeather && (
@@ -113,7 +125,7 @@ export default connect(
     error: state.error,
   }),
   (dispatch) => ({
-    loadCurrentWeather: (city) => dispatch(loadCurrentWeather(city)),
+    loadCurrentWeather: (city, lat, lon) => dispatch(loadCurrentWeather(city, lat, lon)),
     loadFiveDayWeather: (city) => dispatch(loadFiveDayWeather(city)),
   })
 )(App);

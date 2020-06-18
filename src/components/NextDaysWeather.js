@@ -10,7 +10,6 @@ const NextDaysWeather = ({ fiveDayWeather }) => {
         temp: weather?.main?.temp?.toFixed(0),
         type: weather?.weather[0]?.main,
       }));
-    console.log({ data });
     return data;
   }, [fiveDayWeather]);
 
@@ -18,7 +17,7 @@ const NextDaysWeather = ({ fiveDayWeather }) => {
     <div className="weekly-weather">
       {weeklyWeather.map((weather) => (
         <div className="row">
-          <span>{moment(weather.date, 'YYYY-MM-DD', true).format('MMMM Do')}</span>{' '}
+          <span>{moment(weather.date, 'YYYY-MM-DD', true).format('MMM Do')}</span>{' '}
           <span>{weather.temp}&#8451;</span> <span>{weather.type}</span>
         </div>
       ))}
