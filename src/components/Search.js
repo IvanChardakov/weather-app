@@ -1,13 +1,18 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import AutosizeInput from 'react-input-autosize';
 import SearchIcon from '@material-ui/icons/Search';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { changeCity } from '../redux/reducers/weatherReducer';
 import { connect } from 'react-redux';
 import debounce from 'lodash/debounce';
 
-const Search = ({ city, changeCity }) => {
+const Search = ({ city, loading, changeCity }) => {
   const [searchValue, setSearchValue] = useState(city || '');
   const [showIcon, setShowIcon] = useState(true);
+
+  useEffect(() => {
+    loading && setShowIcon(true);
+  }, [loading]);
 
   const onInputChange = useCallback(
     debounce((city) => {
@@ -19,6 +24,9 @@ const Search = ({ city, changeCity }) => {
   const handleOnChange = (value) => {
     onInputChange(value);
     setSearchValue(value);
+    if (showIcon) {
+      setShowIcon(false);
+    }
   };
 
   return (
@@ -30,7 +38,15 @@ const Search = ({ city, changeCity }) => {
         onClick={() => setShowIcon(false)}
         onBlur={() => setShowIcon(true)}
       />
-      {showIcon && <SearchIcon className="search-icon" />}
+      {showIcon && (
+        <>
+          {loading ? (
+            <CircularProgress style={{ width: '20px', height: '20px' }} />
+          ) : (
+            <SearchIcon className="search-icon" />
+          )}
+        </>
+      )}
     </div>
   );
 };
@@ -38,6 +54,7 @@ const Search = ({ city, changeCity }) => {
 export default connect(
   (state) => ({
     city: state.city,
+    loading: state.loading,
   }),
   (dispatch) => ({
     changeCity: (city) => dispatch(changeCity(city)),

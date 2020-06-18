@@ -3,26 +3,40 @@ import axios from 'axios';
 const api = 'http://api.openweathermap.org/data/2.5/';
 const API_KEY = '11180e762873f17713a0cd96aea3d47d';
 
-const initialState = { city: 'plovdiv', currentWeather: {}, loading: false };
+const initialState = { city: 'plovdiv', currentWeather: {}, fiveDayWeather: [], loading: false };
 
 const CHANGE_CITY = 'CHANGE_CITY';
-const START_GET_CURRENT_WEATHER = 'START_GET_CURRENT_WEATHER';
-const END_GET_CURRENT_WEATHER = 'END_GET_CURRENT_WEATHER';
-const ERROR_GET_CURRENT_WEATHER = 'ERROR_GET_CURRENT_WEATHER';
+const GET_WEATHER_ERROR = 'GET_WEATHER_ERROR';
+const START_FETCHING_WEATHER = 'START_FETCHING_WEATHER';
+const END_FETCHING_CURRENT_WEATHER = 'END_FETCHING_CURRENT_WEATHER';
+const END_FETCHING_FIVE_DAY_WEATHER = 'END_FETCHING_FIVE_DAY_WEATHER';
 
 const changeCurrentCity = createAction(CHANGE_CITY);
-const startGetCurrentWeather = createAction(START_GET_CURRENT_WEATHER);
-const endGetCurrentWeather = createAction(END_GET_CURRENT_WEATHER);
-const errorGetCurrentWeather = createAction(ERROR_GET_CURRENT_WEATHER);
+const getWeatherError = createAction(GET_WEATHER_ERROR);
+const startFetchingWeather = createAction(START_FETCHING_WEATHER);
+const endFetchingCurrentWeather = createAction(END_FETCHING_CURRENT_WEATHER);
+const endFetchingFiveDayWeather = createAction(END_FETCHING_FIVE_DAY_WEATHER);
 
 export const loadCurrentWeather = (city) => {
   return async (dispatch) => {
-    dispatch(startGetCurrentWeather());
+    dispatch(startFetchingWeather());
     try {
       const response = await axios.get(`${api}weather?appid=${API_KEY}&q=${city}&units=metric`);
-      dispatch(endGetCurrentWeather(response));
+      dispatch(endFetchingCurrentWeather(response));
     } catch (error) {
-      dispatch(errorGetCurrentWeather(error?.response?.data?.message || 'Something happend'));
+      dispatch(getWeatherError(error?.response?.data?.message || 'Something happend'));
+    }
+  };
+};
+
+export const loadFiveDayWeather = (city) => {
+  return async (dispatch) => {
+    dispatch(startFetchingWeather());
+    try {
+      const response = await axios.get(`${api}forecast?appid=${API_KEY}&q=${city}&units=metric`);
+      dispatch(endFetchingFiveDayWeather(response));
+    } catch (error) {
+      dispatch(getWeatherError(error?.response?.data?.message || 'Something happend'));
     }
   };
 };
@@ -40,19 +54,25 @@ export const weatherReducer = handleActions(
       loading: false,
       city: payload,
     }),
-    [START_GET_CURRENT_WEATHER]: (state, { payload }) => ({
+    [START_FETCHING_WEATHER]: (state, { payload }) => ({
       ...state,
       loading: true,
       error: null,
       ...payload,
     }),
-    [END_GET_CURRENT_WEATHER]: (state, { payload }) => ({
+    [END_FETCHING_CURRENT_WEATHER]: (state, { payload }) => ({
       ...state,
       loading: false,
       error: null,
       currentWeather: payload.data,
     }),
-    [ERROR_GET_CURRENT_WEATHER]: (state, { payload }) => ({
+    [END_FETCHING_FIVE_DAY_WEATHER]: (state, { payload }) => ({
+      ...state,
+      loading: false,
+      error: null,
+      fiveDayWeather: payload.data.list,
+    }),
+    [GET_WEATHER_ERROR]: (state, { payload }) => ({
       ...state,
       loading: false,
       error: payload,

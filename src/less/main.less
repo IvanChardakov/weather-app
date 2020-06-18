@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  color: white;
   & .content-wrapper {
     padding: 40px 20px 0 20px;
   }
@@ -25,12 +26,9 @@
     font-weight: bold;
     text-transform: uppercase;
   }
-  & .search-icon {
-    color: #fff;
-  }
 }
 
-.moreDetails {
+.more-details {
   background: none;
   color: inherit;
   border: none;
@@ -39,7 +37,6 @@
   cursor: pointer;
   outline: inherit;
   text-decoration: underline;
-  color: white;
   font-size: 12px;
   margin-top: 10px;
 }
@@ -51,7 +48,6 @@
   &-temp {
     font-size: 96px;
     font-weight: bold;
-    color: white;
   }
   &-icon-wrapper {
     display: flex;
@@ -60,15 +56,35 @@
     & .celsius {
       font-size: 36px;
       font-weight: bold;
-      color: white;
       & sup {
         font-size: 48px;
       }
     }
   }
   &-type {
-    color: white;
     font-size: 24px;
     font-weight: bold;
+  }
+  &-details {
+    padding: 20px;
+
+    &-block {
+      padding-bottom: 10%;
+      & .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        &-item {
+          width: 40%;
+          display: flex;
+          align-items: center;
+          margin-bottom: 35px;
+          & span {
+            margin-right: 10px;
+          }
+        }
+      }
+    }
   }
 }
