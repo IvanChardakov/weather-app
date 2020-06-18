@@ -4,24 +4,8 @@ import { connect } from 'react-redux';
 import { loadCurrentWeather, loadFiveDayWeather } from './redux/reducers/weatherReducer';
 import WeatherWidget from './components/WeatherWidget';
 import WeatherDetails from './components/WeatherDetails';
-
-import SunnyImage from './img/sunny.png';
-import RainyImage from './img/rainy.png';
-
-const WEATHER_TYPE_STYLES = {
-  Rainy: {
-    img: RainyImage,
-    color: '#61A9A6',
-  },
-  Sunny: {
-    img: SunnyImage,
-    color: '#EEB625',
-  },
-  Cloudy: {
-    img: SunnyImage,
-    color: '#EEB625',
-  },
-};
+import NextDaysWeather from './components/NextDaysWeather';
+import { WEATHER_TYPE_STYLES, APP_STATES } from './constants';
 
 function getBackgroundColor(currentWeather, showDetailedWeather) {
   if (showDetailedWeather) {
@@ -43,41 +27,44 @@ function App({
   currentWeather,
   error,
 }) {
-  const [showDetailedWeather, setShowDetailedWeather] = useState(false);
+  const [appState, setAppState] = useState(APP_STATES.initial);
 
   useEffect(() => {
     loadCurrentWeather(city);
   }, [city, loadCurrentWeather]);
 
   useEffect(() => {
-    if (showDetailedWeather) {
+    if (appState !== APP_STATES.initial) {
       loadFiveDayWeather(city);
     }
-  }, [city, showDetailedWeather, loadFiveDayWeather]);
+  }, [city, loadFiveDayWeather, appState]);
 
   return (
     <div
       className="app"
       style={{
-        backgroundColor: getBackgroundColor(currentWeather, showDetailedWeather),
+        backgroundColor: getBackgroundColor(currentWeather, appState !== APP_STATES.initial),
       }}
     >
       <div
-        onClick={() => (showDetailedWeather ? setShowDetailedWeather(false) : null)}
+        onClick={() => (appState !== APP_STATES.initial ? setAppState(APP_STATES.initial) : null)}
         className="content-wrapper"
-        style={showDetailedWeather ? { paddingTop: '20px' } : null}
+        style={appState !== APP_STATES.initial ? { paddingTop: '20px' } : null}
       >
         <Search city={city} />
         {city && !error && !loading && (
           <>
             {currentWeather && (
-              <WeatherWidget currentWeather={currentWeather} compactView={showDetailedWeather} />
+              <WeatherWidget
+                currentWeather={currentWeather}
+                compactView={appState !== APP_STATES.initial}
+              />
             )}
-            {!showDetailedWeather && (
+            {appState === APP_STATES.initial && (
               <button
                 type="button"
                 className="more-details"
-                onClick={() => setShowDetailedWeather(!showDetailedWeather)}
+                onClick={() => setAppState(APP_STATES.detailedWeather)}
               >
                 More details
               </button>
@@ -87,7 +74,7 @@ function App({
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </div>
       <div>
-        {!showDetailedWeather &&
+        {appState === APP_STATES.initial &&
           currentWeather?.weather &&
           currentWeather.weather.length > 0 &&
           currentWeather.weather[0].main && (
@@ -100,8 +87,17 @@ function App({
               style={{ height: '100%', objectFit: 'contain' }}
             />
           )}
-        {showDetailedWeather && (
-          <WeatherDetails currentWeather={currentWeather} fiveDayWeather={fiveDayWeather} />
+        {appState === APP_STATES.detailedWeather && (
+          <>
+            <WeatherDetails
+              currentWeather={currentWeather}
+              fiveDayWeather={fiveDayWeather}
+              setAppState={setAppState}
+            />
+          </>
+        )}
+        {appState === APP_STATES.nextDaysWeather && (
+          <NextDaysWeather fiveDayWeather={fiveDayWeather} />
         )}
       </div>
     </div>

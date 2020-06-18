@@ -28,7 +28,7 @@
   }
 }
 
-.more-details {
+button {
   background: none;
   color: inherit;
   border: none;
@@ -36,9 +36,11 @@
   font: inherit;
   cursor: pointer;
   outline: inherit;
-  text-decoration: underline;
-  font-size: 12px;
-  margin-top: 10px;
+  &.more-details {
+    text-decoration: underline;
+    font-size: 12px;
+    margin-top: 10px;
+  }
 }
 
 .weather {
@@ -85,6 +87,21 @@
           }
         }
       }
+    }
+  }
+}
+
+.weekly-weather {
+  padding: 20px;
+  & .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+    // margin-bottom: 20px;
+    border-bottom: 1px solid #fff;
+    & span {
+      width: 25%;
     }
   }
 }

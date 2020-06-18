@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { LineChart, Line, XAxis } from 'recharts';
+import { APP_STATES } from '../constants';
 
 import Clouds from '../img/clouds.png';
 import Humidity from '../img/humidity.png';
@@ -34,7 +35,7 @@ const CustomizedAxisTick = ({ x, y, payload, data }) => {
   );
 };
 
-const WeatherDetails = ({ currentWeather, fiveDayWeather }) => {
+const WeatherDetails = ({ currentWeather, fiveDayWeather, setAppState }) => {
   const { wind, main, clouds } = currentWeather;
 
   const hourlyWeather = useMemo(() => {
@@ -90,7 +91,7 @@ const WeatherDetails = ({ currentWeather, fiveDayWeather }) => {
         </div>
       </div>
       <div className="weather-details-block">
-        <p>Next days</p>
+        <button onClick={() => setAppState(APP_STATES.nextDaysWeather)}>Next days</button>
       </div>
     </div>
   );
